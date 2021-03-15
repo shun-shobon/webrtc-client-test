@@ -2,8 +2,8 @@ import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 
 const App: FC = () => {
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const localAudioRef = useRef<HTMLAudioElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const peerRef = useRef<RTCPeerConnection | undefined>(undefined);
 
   const [
@@ -22,15 +22,14 @@ const App: FC = () => {
 
   useEffect(() => {
     (async () => {
-      if (localVideoRef.current === null || remoteVideoRef.current === null) {
+      if (localAudioRef.current === null || remoteAudioRef.current === null) {
         return;
       }
 
       const localMediaStream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: true,
       });
-      localVideoRef.current.srcObject = localMediaStream;
+      localAudioRef.current.srcObject = localMediaStream;
 
       const peer = new RTCPeerConnection({
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
@@ -49,11 +48,11 @@ const App: FC = () => {
 
       peer.addEventListener("track", (event) => {
         const stream = event.streams[0];
-        if (stream === undefined || remoteVideoRef.current === null) return;
-        remoteVideoRef.current.srcObject = stream;
+        if (stream === undefined || remoteAudioRef.current === null) return;
+        remoteAudioRef.current.srcObject = stream;
       });
     })();
-  }, [localVideoRef, remoteVideoRef]);
+  }, [localAudioRef, remoteAudioRef]);
 
   const handleGenerateSdpOffer = async () => {
     const peer = peerRef.current;
@@ -100,10 +99,10 @@ const App: FC = () => {
   return (
     <div>
       <div>
-        <video ref={localVideoRef} autoPlay muted />
+        <audio ref={localAudioRef} autoPlay muted />
       </div>
       <div>
-        <video ref={remoteVideoRef} autoPlay />
+        <audio ref={remoteAudioRef} autoPlay />
       </div>
       <div>
         <textarea
